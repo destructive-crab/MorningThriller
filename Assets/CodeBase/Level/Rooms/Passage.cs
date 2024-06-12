@@ -6,7 +6,7 @@ namespace destructive_code.Level
 {
     public sealed class Passage : DepressedBehaviour
     {
-        public Directions Direction { get; private set; }
+        [field: SerializeField] public Directions Direction { get; private set; }
         public RoomBase ConnectedRoom { get; private set; }
 
         [SerializeField] private GameObject wall;
