@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace destrutctive_code.GUIWindows
+namespace destructive_code.Level.GUIWindows
 {
     public abstract class GUILayer : MonoBehaviour
     {

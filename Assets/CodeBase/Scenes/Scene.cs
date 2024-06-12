@@ -1,6 +1,6 @@
 using System;
-using destrutctive_code.GameStates;
-using destrutctive_code.GUIWindows;
+using destructive_code.Level.GameStates;
+using destructive_code.Level.GUIWindows;
 using UnityEngine;
 
 namespace destructive_code.Scenes

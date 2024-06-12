@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace destrutctive_code.GUIWindows
+namespace destructive_code.Level.GUIWindows
 {
     public abstract class GUIWindow : MonoBehaviour
     {

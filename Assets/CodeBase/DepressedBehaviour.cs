@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace destrutctive_code
+namespace destructive_code.Level
 {
     public class DepressedBehaviour : MonoBehaviour
     {
