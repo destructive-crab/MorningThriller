@@ -1,6 +1,6 @@
-namespace destructive_code.Level
+namespace destructive_code.LevelGeneration
 {
-    public enum Directions
+    public enum Direction
     {
         Top,
         Bottom,

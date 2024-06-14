@@ -1,4 +1,5 @@
 using System;
+using destructive_code.LevelGeneration;
 using destructive_code.SceneLoader;    
 
 namespace destructive_code.Scenes
@@ -7,6 +8,7 @@ namespace destructive_code.Scenes
     {
         public static bool IsSceneLoaded { get; private set; }
         public static Scene CurrentScene { get; private set; }
+        public static LevelScene LevelScene => CurrentScene as LevelScene;
  
         public static event Action<Scene> OnSceneStartedLoading; //prev
         public static event Action<Scene, Scene> OnSceneLoaded; //prev/new

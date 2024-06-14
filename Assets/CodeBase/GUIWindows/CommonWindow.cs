@@ -1,4 +1,4 @@
-namespace destructive_code.Level.GUIWindows
+namespace destructive_code.LevelGeneration.GUIWindows
 {
     public sealed class CommonWindow : GUIWindow
     {

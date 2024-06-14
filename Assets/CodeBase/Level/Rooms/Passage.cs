@@ -1,16 +1,21 @@
 using System;
-using destructive_code.Level;
+using Unity.Collections;
 using UnityEngine;
 
-namespace destructive_code.Level
+namespace destructive_code.LevelGeneration
 {
     public sealed class Passage : DepressedBehaviour
     {
-        [field: SerializeField] public Directions Direction { get; private set; }
+        [field: SerializeField] public Direction Direction { get; private set; }
+        [field: NaughtyAttributes.ReadOnly, SerializeField] public RoomFactory Factory { get; private set; }
         public RoomBase ConnectedRoom { get; private set; }
 
-        [SerializeField] private GameObject wall;
         [SerializeField] private GameObject door;
+
+        private void Awake()
+        {
+            UpdateFactory();
+        }
 
         private void Reset()
         {
@@ -21,20 +26,25 @@ namespace destructive_code.Level
 
             if (distance.x < 0 && Math.Abs(distance.x) > Math.Abs(distance.y))
             {
-                Direction = Directions.Left;
+                Direction = Direction.Left;
             }
             else if (distance.x > 0 && Math.Abs(distance.x) > Math.Abs(distance.y))
             {
-                Direction = Directions.Right;
+                Direction = Direction.Right;
             }
             else if (distance.y < 0 && Math.Abs(distance.x) < Math.Abs(distance.y))
             {
-                Direction = Directions.Bottom;
+                Direction = Direction.Bottom;
             }
             else if (distance.y > 0 && Math.Abs(distance.x) < Math.Abs(distance.y))
             {
-                Direction = Directions.Top;
+                Direction = Direction.Top;
             }
+        }
+
+        public void UpdateFactory()
+        {
+            Factory = GetComponentInChildren<RoomFactory>();
         }
 
         public void Connect(RoomBase room)
@@ -54,12 +64,10 @@ namespace destructive_code.Level
 
         public void DisablePassage()
         {
-            wall.SetActive(true);
             gameObject.SetActive(false);
         }
         public void EnablePassage()
         {
-            wall.SetActive(false);
             gameObject.SetActive(true);
         }
     }

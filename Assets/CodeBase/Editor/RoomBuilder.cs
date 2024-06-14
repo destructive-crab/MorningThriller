@@ -1,5 +1,5 @@
 using System;
-using destructive_code.Level;
+using destructive_code.LevelGeneration;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -21,7 +21,7 @@ namespace rainy_morning
         private Tilemap rightPassageTilemap;
         private Tilemap topPassageTilemap;
         private Tilemap bottomPassageTilemap;
-        
+
         private RoomFactory leftFactory;
         private RoomFactory rightFactory;
         private RoomFactory topFactory;
@@ -60,16 +60,17 @@ namespace rainy_morning
                 
                 GUILayout.Space(15);
              
-                if(GUILayout.Button("Refresh"))
-                    RefreshTilemaps();
+                if(GUILayout.Button("Refresh Data"))
+                    Refresh();
+                
+                if(GUILayout.Button("Total Fix"))
+                    TotalFix();
                 
                 GUILayout.Space(15);
 
                 if (GUILayout.Button("Update Room Size"))
                 {
-                    mainMap.CompressBounds();
-                    
-                    this.room.RoomSize = new Vector2(mainMap.cellBounds.size.x, mainMap.cellBounds.size.y);
+                    UpdateRoomSize();
                 }
                 
                 EditorGUI.BeginDisabledGroup(true);
@@ -87,6 +88,9 @@ namespace rainy_morning
                 if (GUILayout.Button("Build Passages From Prefabs"))
                     CreatePassagesFromPrefabs();
 
+                if (GUILayout.Button("Update Passages"))
+                    UpdatePassages();
+                
                 EditorGUI.BeginDisabledGroup(true);
 
                 EditorGUILayout.ObjectField(LeftPassage, leftPassageTilemap, typeof(Passage), false);
@@ -98,12 +102,12 @@ namespace rainy_morning
                 GUILayout.Space(7);
 
                 GUILayout.Label("Factories: ");
-                
+
                 if(GUILayout.Button("Build Default Factories"))
-                    CreateDefaultFactories();    
-                
-                if(GUILayout.Button("Update Factories Positions"))
                     CreateDefaultFactories();
+
+                if (GUILayout.Button("Update Factories Positions"))
+                    UpdateFactoriesPositions();
                 
                 EditorGUI.BeginDisabledGroup(true);
 
@@ -116,14 +120,31 @@ namespace rainy_morning
             }
         }
 
+        private void UpdateRoomSize()
+        {
+            mainMap.CompressBounds();
+
+            this.room.RoomSize = new Vector2(mainMap.cellBounds.size.x, mainMap.cellBounds.size.y);
+        }
+
+        private void TotalFix()
+        {
+            Refresh();
+            UpdateRoomSize();
+            UpdatePassages();
+            UpdateFactoriesPositions();
+        }
+
         private void CreatePassagesFromPrefabs()
         {
             ClearPassages();
             
-            CreatePassageFromPrefab(Directions.Left);
-            CreatePassageFromPrefab(Directions.Right);
-            CreatePassageFromPrefab(Directions.Top);
-            CreatePassageFromPrefab(Directions.Bottom);
+            CreatePassageFromPrefab(Direction.Left);
+            CreatePassageFromPrefab(Direction.Right);
+            CreatePassageFromPrefab(Direction.Top);
+            CreatePassageFromPrefab(Direction.Bottom);
+
+            UpdatePassages();
         }
 
         private void Refresh()
@@ -170,6 +191,8 @@ namespace rainy_morning
                 bounds => new Vector3Int(bounds.xMin, bounds.yMin + 1), 
                 bounds => new Vector3Int(bounds.xMax, bounds.yMin + 1), 
                 true);
+            
+            RefreshFactories();
         }
 
         private void CreateNewFactoryFor(Tilemap tilemap, 
@@ -184,11 +207,14 @@ namespace rainy_morning
                 return;
             }
 
-            var previousFactory = tilemap.GetComponentInChildren<RoomFactory>();
-
-            if(previousFactory != null)
+            if (factoryInstance == null)
             {
-                DestroyImmediate(previousFactory.gameObject);
+                var previousFactory = tilemap.GetComponentInChildren<RoomFactory>();
+                
+                if(previousFactory != null)
+                {
+                    DestroyImmediate(previousFactory.gameObject);
+                }
             }
 
             tilemap.CompressBounds();   
@@ -206,7 +232,7 @@ namespace rainy_morning
             {
                 centerPosition = new Vector3(from.x, (from.y + to.y) / 2);
             }
-            
+
             if(factoryInstance == null)
             {
                 factoryInstance = new GameObject($"[{tilemap.name} Factory]");
@@ -219,6 +245,7 @@ namespace rainy_morning
             }
           
             factoryInstance.transform.position = centerPosition;
+            factoryInstance.GetComponent<RoomFactory>().SetOffset(centerPosition);
         }
 
         private void RefreshTilemaps()
@@ -228,19 +255,19 @@ namespace rainy_morning
 
             foreach (var passage in passages)
             {
-                if (passage.Direction == Directions.Left)
+                if (passage.Direction == Direction.Left)
                 {
                     leftPassageTilemap = passage.GetComponent<Tilemap>();
                 }
-                if (passage.Direction == Directions.Right)
+                if (passage.Direction == Direction.Right)
                 {
                     rightPassageTilemap = passage.GetComponent<Tilemap>();
                 }
-                if (passage.Direction == Directions.Top)
+                if (passage.Direction == Direction.Top)
                 {
                     topPassageTilemap = passage.GetComponent<Tilemap>();
                 }
-                if (passage.Direction == Directions.Bottom)
+                if (passage.Direction == Direction.Bottom)
                 {
                     bottomPassageTilemap = passage.GetComponent<Tilemap>();
                 }
@@ -255,24 +282,26 @@ namespace rainy_morning
             rightPassageTilemap = CreateClearPassage("[Passage Right]", Vector2.right).GetComponent<Tilemap>();
             topPassageTilemap = CreateClearPassage("[Passage Top]", Vector2.up).GetComponent<Tilemap>();
             bottomPassageTilemap = CreateClearPassage("[Passage Bottom]", Vector2.down).GetComponent<Tilemap>();
+            
+            UpdatePassages();
         }
 
-        public void CreatePassageFromPrefab(Directions direction)
+        public void CreatePassageFromPrefab(Direction direction)
         {
             Object passagePrefab;
             
             switch (direction)
             {
-                case Directions.Top:
+                case Direction.Top:
                     passagePrefab = PrefabUtility.InstantiatePrefab(Resources.Load<Passage>("[Passage Top]"), GridTransform);
                     break;
-                case Directions.Bottom:
+                case Direction.Bottom:
                     passagePrefab = PrefabUtility.InstantiatePrefab(Resources.Load<Passage>("[Passage Bottom]"), GridTransform);
                     break;
-                case Directions.Left:
+                case Direction.Left:
                     passagePrefab = PrefabUtility.InstantiatePrefab(Resources.Load<Passage>("[Passage Left]"), GridTransform);
                     break;
-                case Directions.Right:
+                case Direction.Right:
                     passagePrefab = PrefabUtility.InstantiatePrefab(Resources.Load<Passage>("[Passage Right]"), GridTransform);
                     break;
                 default:
@@ -291,7 +320,7 @@ namespace rainy_morning
                 transform =
                 {
                     position = GridTransform.position + offset,
-                    parent = GridTransform
+                    parent = mainMap.transform.parent
                 }
             };
 
@@ -318,6 +347,53 @@ namespace rainy_morning
                     Undo.DestroyObjectImmediate(map.gameObject);
                 }
             }
+            
+            room.GetComponent<PassageHandler>().ClearPassages();
+        }
+
+        private void UpdatePassages()
+        {
+            room.GetComponent<PassageHandler>().ClearPassages();
+            
+            room.GetComponent<PassageHandler>().SetPassage(leftPassageTilemap.GetComponent<Passage>());
+            room.GetComponent<PassageHandler>().SetPassage(bottomPassageTilemap.GetComponent<Passage>());
+            room.GetComponent<PassageHandler>().SetPassage(rightPassageTilemap.GetComponent<Passage>());
+            room.GetComponent<PassageHandler>().SetPassage(topPassageTilemap.GetComponent<Passage>());
+        }
+
+        private void UpdateFactoriesPositions()
+        {
+            CreateNewFactoryFor(leftPassageTilemap, 
+                bounds => new Vector3Int(bounds.xMin + 1, bounds.yMax), 
+                bounds => new Vector3Int(bounds.xMin + 1, bounds.yMin), 
+                false,
+                leftFactory.gameObject);
+            
+            leftPassageTilemap.GetComponent<Passage>().UpdateFactory();
+            
+            CreateNewFactoryFor(rightPassageTilemap, 
+                bounds => new Vector3Int(bounds.xMax - 1, bounds.yMax), 
+                bounds => new Vector3Int(bounds.xMax - 1, bounds.yMin), 
+                false,
+                rightFactory.gameObject);
+            
+            rightPassageTilemap.GetComponent<Passage>().UpdateFactory();
+            
+            CreateNewFactoryFor(topPassageTilemap, 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMax - 1), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMax - 1), 
+                true,
+                topFactory.gameObject);
+            
+            bottomPassageTilemap.GetComponent<Passage>().UpdateFactory();
+            
+            CreateNewFactoryFor(bottomPassageTilemap, 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMin + 1), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMin + 1), 
+                true,
+                bottomFactory.gameObject);
+            
+            topPassageTilemap.GetComponent<Passage>().UpdateFactory();
         }
     }
 }

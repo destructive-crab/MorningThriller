@@ -1,4 +1,4 @@
-namespace destructive_code.Level.GameStates
+namespace destructive_code.LevelGeneration.GameStates
 {
     public abstract class GameState
     {

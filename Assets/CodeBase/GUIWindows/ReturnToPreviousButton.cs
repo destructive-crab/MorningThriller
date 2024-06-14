@@ -1,4 +1,4 @@
-using destructive_code.Level.GUIWindows;
+using destructive_code.LevelGeneration.GUIWindows;
 using destructive_code.Scenes;
 
 public sealed class ReturnToPreviousButton : GUIWindow

@@ -1,5 +1,5 @@
 using System;
-using destructive_code.Level;
+using destructive_code.LevelGeneration;
 using destructive_code.GameObjects;
 using UnityEngine;
 using Object = UnityEngine.Object;

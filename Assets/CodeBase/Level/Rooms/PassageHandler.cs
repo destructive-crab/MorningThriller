@@ -1,89 +1,118 @@
-﻿// using System.Collections.Generic;
-// using UnityEngine;
-//
-// namespace destructive_code.Level
-// {
-//     [RequireComponent(typeof(RoomBase))]
-//     public sealed class PassageHandler : DepressedBehaviour
-//     {
-//         [SerializeField] private Dictionary<Directions, Passage> passages;
-//         private RoomBase _room;
-//         
-//         private void Awake()
-//         {
-//             _room = GetComponent<RoomBase>();
-//             
-//             foreach (var passage in passages)
-//                 passage.Value.Factory.Init(_room, passage.Key);
-//             
-//             OpenAllDoors();
-//         }
-//
-//         public bool Contains(Directions direction) => passages.ContainsKey(direction);
-//         
-//         public void OpenAllDoors()
-//         {
-//             foreach (var passage in passages)
-//                 passage.Value.OpenDoor();
-//         }
-//
-//         public void CloseAllDoors()
-//         {
-//             foreach (var passage in passages)
-//                 passage.Value.CloseDoor();
-//         }
-//         
-//         public Passage GetPassage(Directions direction)
-//             => passages.TryGetValue(direction, out var passage) ? passage : null;
-//
-//         public bool TryGetFree(out Passage freePassage)
-//         {
-//             foreach (var passage in passages)
-//             {
-//                 if (passage.Value.ConnectedRoom == null)
-//                 {
-//                     freePassage = passage.Value;
-//                     return true;
-//                 }
-//             }
-//
-//             freePassage = null;
-//             return false;
-//         }
-//
-//         public void BuildPassages(List<Directions> directions)
-//         {
-//             int firstToDelete = Random.Range(0, 4);            
-//             int second = Random.Range(0, 4);
-//
-//             if (!directions.Contains((Directions)firstToDelete) && passages.ContainsKey((Directions)firstToDelete))
-//             {
-//                 passages[(Directions)firstToDelete].DisablePassage();
-//                 passages.Remove((Directions)firstToDelete);
-//             }
-//
-//             if (firstToDelete != second && !directions.Contains((Directions)second) && passages.ContainsKey((Directions)second))
-//             {
-//                 passages[(Directions)second].DisablePassage();
-//                 passages.Remove((Directions) second);
-//             }
-//         }
-//
-//         public void CloseAllFree()
-//         {
-//             List<Directions> toRemove = new();
-//
-//             foreach (var passage in passages)
-//             {
-//                 if (passage.Value.ConnectedRoom == null)
-//                 {
-//                     passage.Value.DisablePassage();                    
-//                     toRemove.Add(passage.Key);
-//                 }
-//             }
-//
-//             foreach (var direction in toRemove)
-//                 passages.Remove(direction);
-//         }
-//     }
-// }
+﻿using System.Collections.Generic;
+using NaughtyAttributes;
+using UnityEngine;
+
+namespace destructive_code.LevelGeneration
+{
+    [RequireComponent(typeof(RoomBase))]
+    public sealed class PassageHandler : DepressedBehaviour
+    {
+        [SerializeField, ReadOnly] private List<Passage> passagesList;
+        
+        private readonly Dictionary<Direction, Passage> passages = new ();
+        private RoomBase _room;
+
+        public void ClearPassages()
+        {
+            passagesList.Clear();
+        }
+        
+        public void SetPassage(Passage passage)
+        {
+            passagesList.Add(passage);
+        }
+        
+        private void Awake()
+        {
+            _room = GetComponent<RoomBase>();
+
+            InitPassagesDictionary();
+
+            OpenAllDoors();
+        }
+
+        private void InitPassagesDictionary()
+        {
+            foreach (var passage in passagesList)
+            {
+                if(passage.Factory == null)
+                    passage.UpdateFactory();
+
+                passage.Factory.Init(_room, passage.Direction);
+                passages.Add(passage.Direction, passage);
+            }
+        }
+
+        public bool Contains(Direction direction) => passages.ContainsKey(direction);
+        
+        public void OpenAllDoors()
+        {
+            foreach (var passage in passages)
+                passage.Value.OpenDoor();
+        }
+
+        public void CloseAllDoors()
+        {
+            foreach (var passage in passages)
+                passage.Value.CloseDoor();
+        }
+        
+        public Passage GetPassage(Direction direction)
+        {
+            if(passages.Count == 0 && passagesList.Count > 0)
+                InitPassagesDictionary();
+
+            return passages.TryGetValue(direction, out var passage) ? passage : null;
+        }
+
+        public bool TryGetFree(out Passage freePassage)
+        {
+            foreach (var passage in passages)
+            {
+                if (passage.Value.ConnectedRoom == null)
+                {
+                    freePassage = passage.Value;
+                    return true;
+                }
+            }
+
+            freePassage = null;
+            return false;
+        }
+
+        public void BuildPassages(List<Direction> directions)
+        {
+            int firstToDelete = Random.Range(0, 4);            
+            int second = Random.Range(0, 4);
+
+            if (!directions.Contains((Direction)firstToDelete) && passages.ContainsKey((Direction)firstToDelete))
+            {
+                passages[(Direction)firstToDelete].DisablePassage();
+                passages.Remove((Direction)firstToDelete);
+            }
+
+            if (firstToDelete != second && !directions.Contains((Direction)second) && passages.ContainsKey((Direction)second))
+            {
+                passages[(Direction)second].DisablePassage();
+                passages.Remove((Direction) second);
+            }
+        }
+
+        public void CloseAllFree()
+        {
+            List<Direction> toRemove = new();
+
+            foreach (var passage in passages)
+            {
+                if (passage.Value.ConnectedRoom == null)
+                {
+                    passage.Value.DisablePassage();                    
+                    toRemove.Add(passage.Key);
+                }
+            }
+
+            foreach (var direction in toRemove)
+                passages.Remove(direction);
+        }
+    }
+}
