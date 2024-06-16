@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a45d175892a14f65857c35c290910b73, type: 3}
+  m_Name: Level Config
+  m_EditorClassIdentifier: 
+  <TotalRoomsCount>k__BackingField: 90
+  <TraderRoomsCount>k__BackingField: 0
+  <NPCRoomsCount>k__BackingField: 0
+  CombatRooms:
+  - {fileID: 2554381621855700849, guid: f8861b419adfcf44b86eca701d138f5b, type: 3}
+  - {fileID: 2554381621855700849, guid: 7b8ee2c20733aa14bbff26144adf9995, type: 3}
+  - {fileID: 2554381621855700849, guid: 38f3ae03ba698c843a8bd636a155b687, type: 3}
+  TreasureRooms:
+  - {fileID: 2554381621855700849, guid: f8861b419adfcf44b86eca701d138f5b, type: 3}
+  NPCRooms:
+  - {fileID: 2554381621855700849, guid: f8861b419adfcf44b86eca701d138f5b, type: 3}
+  TraderRooms:
+  - {fileID: 2554381621855700849, guid: f8861b419adfcf44b86eca701d138f5b, type: 3}
+  ExitRooms:
+  - {fileID: 2554381621855700849, guid: f8861b419adfcf44b86eca701d138f5b, type: 3}

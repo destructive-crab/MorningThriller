@@ -12,8 +12,12 @@ namespace destructive_code.LevelGeneration
 
         private readonly List<RoomBase> _spawnedRooms = new();
 
+        private Transform container;
+
         public void Generate(Transform container, Level level)
         {
+            this.container = container;
+            
             var mustSpawnQueue = new Queue<RoomBase>();
             
             var roomQueue = new Queue<RoomBase>();
@@ -26,6 +30,7 @@ namespace destructive_code.LevelGeneration
             AddSpawnedRoom(startRoom);
 
             int i = 0;
+            
             while (CurrentRoomsCount < level.Length && i < level.Length * 4 && roomQueue.Count > 0)
             {
                 i++;
@@ -46,6 +51,7 @@ namespace destructive_code.LevelGeneration
                     if (room != null)
                     {
                         roomQueue.Enqueue(room);
+                        AddSpawnedRoom(room);
                     }
                     else
                     {
@@ -65,7 +71,10 @@ namespace destructive_code.LevelGeneration
                 room.PassageHandler.CloseAllFree();
         }
 
-        public void AddSpawnedRoom(RoomBase room) 
-            => _spawnedRooms.Add(room);
+        public void AddSpawnedRoom(RoomBase room)
+        {
+            _spawnedRooms.Add(room);
+            room.transform.parent = container;
+        }
     }
 }

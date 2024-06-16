@@ -7,44 +7,44 @@ namespace destructive_code.LevelGeneration
     [RequireComponent(typeof(RoomBase))]
     public sealed class PassageHandler : DepressedBehaviour
     {
-        [SerializeField, ReadOnly] private List<Passage> passagesList;
-        
-        private readonly Dictionary<Direction, Passage> passages = new ();
-        private RoomBase _room;
+        private readonly Dictionary<Direction, Passage> passages = new();
+        private RoomBase room;
 
-        public void ClearPassages()
+        public void InitRoomRef()
         {
-            passagesList.Clear();
-        }
-        
-        public void SetPassage(Passage passage)
-        {
-            passagesList.Add(passage);
-        }
-        
-        private void Awake()
-        {
-            _room = GetComponent<RoomBase>();
-
-            InitPassagesDictionary();
-
-            OpenAllDoors();
+            room = GetComponent<RoomBase>();
         }
 
-        private void InitPassagesDictionary()
+        public void ProcessPassagesAndFactories()
         {
+            var passagesList = GetComponentsInChildren<Passage>();
+            
             foreach (var passage in passagesList)
             {
-                if(passage.Factory == null)
-                    passage.UpdateFactory();
-
-                passage.Factory.Init(_room, passage.Direction);
-                passages.Add(passage.Direction, passage);
+                passage.UpdateReferences();
+                
+                passage.Factory.Init(room);
+                passage.Factory.Init(passage.Direction);
+                
+                passages.TryAdd(passage.Direction, passage);
             }
         }
 
         public bool Contains(Direction direction) => passages.ContainsKey(direction);
-        
+
+        public Passage FitIn(Transform who)
+        {
+            foreach (var passage in passages)
+            {
+                if (passage.Value.Tilemap.cellBounds.Contains(passage.Value.Tilemap.WorldToCell(new Vector3Int((int) who.position.x, (int) who.position.y, 0))))
+                {
+                    return passage.Value;
+                }
+            }
+
+            return null;
+        }
+
         public void OpenAllDoors()
         {
             foreach (var passage in passages)
@@ -59,9 +59,6 @@ namespace destructive_code.LevelGeneration
         
         public Passage GetPassage(Direction direction)
         {
-            if(passages.Count == 0 && passagesList.Count > 0)
-                InitPassagesDictionary();
-
             return passages.TryGetValue(direction, out var passage) ? passage : null;
         }
 

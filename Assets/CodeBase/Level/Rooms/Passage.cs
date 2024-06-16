@@ -1,6 +1,7 @@
 using System;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace destructive_code.LevelGeneration
 {
@@ -8,14 +9,11 @@ namespace destructive_code.LevelGeneration
     {
         [field: SerializeField] public Direction Direction { get; private set; }
         [field: NaughtyAttributes.ReadOnly, SerializeField] public RoomFactory Factory { get; private set; }
-        public RoomBase ConnectedRoom { get; private set; }
-
+        
         [SerializeField] private GameObject door;
-
-        private void Awake()
-        {
-            UpdateFactory();
-        }
+        
+        public Tilemap Tilemap { get; private set; }
+        public RoomBase ConnectedRoom { get; private set; }
 
         private void Reset()
         {
@@ -42,9 +40,10 @@ namespace destructive_code.LevelGeneration
             }
         }
 
-        public void UpdateFactory()
+        public void UpdateReferences()
         {
             Factory = GetComponentInChildren<RoomFactory>();
+            Tilemap = GetComponent<Tilemap>();
         }
 
         public void Connect(RoomBase room)
@@ -66,6 +65,7 @@ namespace destructive_code.LevelGeneration
         {
             gameObject.SetActive(false);
         }
+
         public void EnablePassage()
         {
             gameObject.SetActive(true);

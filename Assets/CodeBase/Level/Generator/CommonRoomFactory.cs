@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using destructive_code.Scenes;
 using NaughtyAttributes;
@@ -6,25 +5,32 @@ using UnityEngine;
 
 namespace destructive_code.LevelGeneration
 {
+    [RequireComponent(typeof(Passage))]
     public class CommonRoomFactory : RoomFactory
     {
         [SerializeField, ReadOnly] private Direction direction;
         private RoomBase owner;
         
         private Level level;
-        
-        public override void Init(RoomBase owner, Direction direction)
+
+        private void Reset()
         {
-            if (this.owner == null)
-            {
-                this.owner = owner;
-            }
+            direction = GetComponent<Passage>().Direction;
+        }
+
+        public override void Init(Direction direction)
+        {
             this.direction = direction;
         }
 
         private void Awake()
         {
             level = SceneSwitcher.LevelScene.Level;
+        }
+
+        public override void Init(RoomBase owner)
+        {
+            this.owner = owner;
         }
 
         public override RoomBase CreateByType(RoomType roomType, bool remove = true)
@@ -41,7 +47,7 @@ namespace destructive_code.LevelGeneration
 
         public override RoomBase CreateByPrefab(RoomBase roomToSpawn)
         {
-            transform.localPosition = GetPosition(roomToSpawn);
+            roomToSpawn.Init();
 
             if (!CheckPlace(roomToSpawn))
                 return null;
@@ -58,7 +64,8 @@ namespace destructive_code.LevelGeneration
         private RoomBase SpawnRoom(RoomBase roomToSpawn)
         {
             var spawnedRoom = SceneSwitcher.CurrentScene.Fabric
-                .Instantiate<RoomBase>(roomToSpawn, transform.position, Quaternion.identity);
+                .Instantiate<RoomBase>(roomToSpawn, GetPosition(roomToSpawn), Quaternion.identity);
+            
             return spawnedRoom;
         }
 
@@ -72,7 +79,7 @@ namespace destructive_code.LevelGeneration
         {
             var roomPlaceMask = LayerMask.GetMask("RoomPlace");
             
-            var overlapResult = Physics2D.OverlapBoxAll(transform.position, roomToSpawn.RoomSize, 0f, roomPlaceMask);
+            var overlapResult = Physics2D.OverlapBoxAll(GetPosition(roomToSpawn), roomToSpawn.RoomSize, 0f, roomPlaceMask);
 
             foreach (var hit2D in overlapResult) 
             {
@@ -85,7 +92,7 @@ namespace destructive_code.LevelGeneration
 
         private Vector3 GetPosition(RoomBase roomToSpawn)
         {
-            return owner.GetOffCenter(direction) - roomToSpawn.GetOffCenter(DirectionHelper.GetOpposite(direction));
+            return owner.transform.position + (owner.GetOffCenter(direction) - roomToSpawn.GetOffCenter(DirectionHelper.GetOpposite(direction)));
         }
     }
 }

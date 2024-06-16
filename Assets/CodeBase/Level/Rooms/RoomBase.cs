@@ -1,4 +1,4 @@
-using System;
+using destructive_code.LevelGeneration.CameraManagement;
 using UnityEngine;
 
 namespace destructive_code.LevelGeneration
@@ -8,13 +8,30 @@ namespace destructive_code.LevelGeneration
     {
         [field: SerializeField] public Vector2 RoomSize { get; set; }    
         public PassageHandler PassageHandler { get; private set; }
-
+        public bool Initialized { get; private set; } = false;
+        
+        public RoomCameraManager CameraManager { get; private set; }
+        
         private void Awake()
         {
-            InitPassageHandler();
+            if(!Initialized)
+                Init();
         }
 
-        private void InitPassageHandler() => PassageHandler = GetComponent<PassageHandler>();
+        public void Init()
+        {
+            InitPassageHandler();
+
+            var root = new RoomRoot(this);
+            root.Construct();
+
+            CameraManager = new RoomCameraManager(this.transform);
+            
+            Initialized = true;
+        }
+
+        private void InitPassageHandler() 
+            => PassageHandler = GetComponent<PassageHandler>();
 
         private void OnDrawGizmos()
         {
@@ -22,11 +39,11 @@ namespace destructive_code.LevelGeneration
             Gizmos.DrawWireCube(transform.position, RoomSize);
         }
 
-        public Vector2 GetOffCenter(Direction direction)
+        public Vector3 GetOffCenter(Direction direction)
         {
             if(PassageHandler == null) 
                 InitPassageHandler();
-            
+
             return PassageHandler.GetPassage(direction).Factory.Offset;
         }
     }

@@ -1,3 +1,5 @@
+using destructive_code.LevelGeneration.CameraManagement;
+using destructive_code.LevelGeneration.PlayerCode;
 using destructive_code.Scenes;
 using destructive_code.Tests;
 using UnityEngine;
@@ -7,6 +9,8 @@ namespace destructive_code.LevelGeneration
     public class LevelScene : Scene
     {
         public Level Level { get; private set; }
+        public Player Player { get; private set; }
+        public CameraSwitcher CameraSwitcher { get; private set; }
 
         protected LevelConfig config;
 
@@ -30,7 +34,14 @@ namespace destructive_code.LevelGeneration
             Level = new TestLevel(config);
             
             Level.CreateMap();
-            Level.Generator.Generate(new GameObject("Rooms").transform, Level);
+
+            Transform container = new GameObject("Rooms").transform;
+            container.gameObject.AddComponent<RoomsContainer>();
+            
+            Level.Generator.Generate(container, Level);
+
+            Player = GameObject.FindObjectOfType<Player>();
+            CameraSwitcher = new CameraSwitcher();
         }
     }
 }
