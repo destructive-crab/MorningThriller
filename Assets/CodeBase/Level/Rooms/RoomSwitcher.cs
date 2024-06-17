@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using destructive_code.LevelGeneration.PlayerCode;
 using destructive_code.Scenes;
 using UnityEngine;
@@ -55,8 +53,8 @@ namespace destructive_code.LevelGeneration
                 roomBase.CameraManager.VirtualCamera.Follow = player.transform;
                 
                 levelScene.CameraSwitcher.SwitchTo(roomBase.CameraManager.VirtualCamera);
+                
                 entered = true;
-
             }
         }
 
@@ -66,17 +64,18 @@ namespace destructive_code.LevelGeneration
             
             while (!entered)
             {
-                player.transform.position += direction * 0.05f;
+                player.transform.position += direction * 0.1f;
                 yield return new WaitForFixedUpdate();
             }
 
             Vector3 startPosition = player.transform.position;
 
-            while (Vector3.Distance(startPosition, player.transform.position) < 2f)
+            while (Vector3.Distance(startPosition, player.transform.position) < 1.5f)
             {
                 player.transform.position += direction * 0.05f;
                 yield return new WaitForFixedUpdate();
-            }                
+            }               
+             
             player.Enable();
         }
     }

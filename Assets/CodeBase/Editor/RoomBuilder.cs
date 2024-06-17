@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cinemachine;
 using destructive_code.LevelGeneration;
 using Unity.Mathematics;
@@ -119,36 +120,6 @@ namespace rainy_morning
             }
         }
 
-        private void UpdateRoomSize()
-        {
-            mainMap.CompressBounds();
-
-            this.room.RoomSize = new Vector2(mainMap.cellBounds.size.x, mainMap.cellBounds.size.y);
-            
-            if (room.TryGetComponent(out PolygonCollider2D polygonCollider2D))
-            {
-                UpdatePoints(polygonCollider2D);
-            }
-            else
-            {
-                polygonCollider2D = room.gameObject.AddComponent<PolygonCollider2D>();
-                
-                UpdatePoints(polygonCollider2D);
-            }
-
-            void UpdatePoints(PolygonCollider2D component)
-            {
-                component.points
-                    = new[]
-                    {
-                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMax, mainMap.cellBounds.yMax)),
-                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMax, mainMap.cellBounds.yMin)),
-                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMin, mainMap.cellBounds.yMin)),
-                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMin, mainMap.cellBounds.yMax)),
-                    };
-            }
-        }
-
         private void TotalFix()
         {
             Refresh();
@@ -172,6 +143,72 @@ namespace rainy_morning
             RefreshGrid();
             RefreshTilemaps();
             RefreshFactories();
+        }
+
+        private void UpdateRoomSize()
+        {
+            mainMap.CompressBounds();
+
+            this.room.RoomSize = new Vector2(mainMap.cellBounds.size.x, mainMap.cellBounds.size.y);
+            
+            if (room.TryGetComponent(out PolygonCollider2D polygonCollider2D))
+            {
+                UpdatePoints(polygonCollider2D);
+            }
+            else
+            {
+                polygonCollider2D = room.gameObject.AddComponent<PolygonCollider2D>();
+                
+                UpdatePoints(polygonCollider2D);
+            }
+
+            GameObject roomBounds = new GameObject("ROOM BOUNDS");
+            roomBounds.transform.parent = room.transform;
+            
+            PolygonCollider2D collider = roomBounds.AddComponent<PolygonCollider2D>();
+
+            List<Vector2> resultBounds = new List<Vector2>();
+
+            foreach (var point in mainMap.cellBounds.allPositionsWithin)
+            {
+                if (mainMap.GetTile(new Vector3Int((int) point.x, (int) point.y)) != null && CheckTile(point))
+                {
+                    resultBounds.Add(mainMap.CellToWorld(point));
+                    Debug.Log(mainMap.CellToWorld(point));
+                    var g0 = new GameObject(mainMap.CellToWorld(point).ToString());
+                    g0.transform.parent = room.transform;
+                    g0.transform.position = mainMap.CellToWorld(point);
+                }
+            }
+
+            collider.points = resultBounds.ToArray();
+
+            bool CheckTile(Vector3Int position)
+            {
+                if(mainMap.GetTile(position + Vector3Int.up) != null && 
+                   mainMap.GetTile(position + Vector3Int.down) != null && 
+                   mainMap.GetTile(position + Vector3Int.right) != null && 
+                   mainMap.GetTile(position + Vector3Int.left) != null && 
+                   mainMap.GetTile(position + Vector3Int.up + Vector3Int.right) != null && 
+                   mainMap.GetTile(position + Vector3Int.up + Vector3Int.left) != null && 
+                   mainMap.GetTile(position + Vector3Int.down + Vector3Int.right) != null && 
+                   mainMap.GetTile(position + Vector3Int.down + Vector3Int.left) != null)
+                
+                    return false;
+
+                return true;
+            }
+            void UpdatePoints(PolygonCollider2D component)
+            {
+                component.points
+                    = new[]
+                    {
+                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMax, mainMap.cellBounds.yMax)),
+                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMax, mainMap.cellBounds.yMin)),
+                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMin, mainMap.cellBounds.yMin)),
+                        (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMin, mainMap.cellBounds.yMax)),
+                    };
+            }
         }
 
         private void RefreshFactories()

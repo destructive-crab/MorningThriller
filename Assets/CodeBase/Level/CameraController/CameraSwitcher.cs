@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Cinemachine;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace destructive_code.LevelGeneration.CameraManagement
