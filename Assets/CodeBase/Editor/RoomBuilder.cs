@@ -167,22 +167,121 @@ namespace rainy_morning
             
             PolygonCollider2D collider = roomBounds.AddComponent<PolygonCollider2D>();
 
-            List<Vector2> resultBounds = new List<Vector2>();
+            List<Vector2> dirtyPoints = new List<Vector2>();
 
+            //определяем границы
             foreach (var point in mainMap.cellBounds.allPositionsWithin)
             {
-                if (mainMap.GetTile(new Vector3Int((int) point.x, (int) point.y)) != null && CheckTile(point))
+                if (mainMap.GetTile(point) != null && CheckTile(point))
                 {
-                    resultBounds.Add(mainMap.CellToWorld(point));
-                    Debug.Log(mainMap.CellToWorld(point));
-                    var g0 = new GameObject(mainMap.CellToWorld(point).ToString());
-                    g0.transform.parent = room.transform;
-                    g0.transform.position = mainMap.CellToWorld(point);
+                    dirtyPoints.Add(mainMap.CellToWorld(point) + GetOffset(point));
+
+                    var test = new GameObject(mainMap.CellToWorld(point).ToString());
+                    test.transform.parent = room.transform;
+                    test.transform.position = mainMap.CellToWorld(point) + GetOffset(point);
                 }
             }
+            
+            //сортируем точки
+            List<Vector2> resultPoints = new();
 
-            collider.points = resultBounds.ToArray();
+            Vector2 current = dirtyPoints[0];
+            
+            while(dirtyPoints.Count > 0)
+            {
+                var next = FindWithMinDistance(current, dirtyPoints.ToArray());
+                
+                dirtyPoints.Remove(next);
+                resultPoints.Add(next);
+                
+                current = next;
+            }
 
+            //левый проход
+            List<Vector2> dirtDownLeft = new List<Vector2>();
+
+            Vector2 startDownLeft =
+                bottomPassageTilemap.CellToWorld(new Vector3Int(bottomPassageTilemap.cellBounds.xMin, bottomPassageTilemap.cellBounds.yMin));
+            
+            Vector2 endDownLeft =
+                leftPassageTilemap.CellToWorld(new Vector3Int(leftPassageTilemap.cellBounds.xMin, leftPassageTilemap.cellBounds.yMin));
+
+            Bounds downLeftBounds = new Bounds();
+            downLeftBounds.SetMinMax(new Vector3(endDownLeft.x, startDownLeft.y), new Vector3(startDownLeft.x, endDownLeft.y));
+            
+            foreach (var point in resultPoints)
+            {
+                if(downLeftBounds.Contains(point))
+                    dirtDownLeft.Add(point);
+            }
+            
+            List<Vector2> sortedDownLeft = new List<Vector2>();
+            
+            Vector2 currentDownLeft = Find((vector1, vector2) => vector1.x > vector2.x ||  vector1.y < vector2.y, dirtDownLeft.ToArray());
+            
+            while(dirtDownLeft.Count > 0)
+            {
+                var next = FindWithMinDistance(currentDownLeft, dirtDownLeft.ToArray());
+                
+                dirtDownLeft.Remove(next);
+                sortedDownLeft.Add(next);
+                
+                currentDownLeft = next;
+            }
+
+            bottomPassageTilemap.CompressBounds();
+            leftPassageTilemap.CompressBounds();
+            
+            sortedDownLeft.Insert(0, 
+                new Vector2(bottomPassageTilemap.CellToWorld(new(bottomPassageTilemap.cellBounds.xMin, 0, 0)).x, sortedDownLeft[0].y));
+            
+            sortedDownLeft
+                .Insert(0, bottomPassageTilemap.CellToWorld(new(bottomPassageTilemap.cellBounds.xMin, bottomPassageTilemap.cellBounds.yMin + 1, 0)));
+            sortedDownLeft.Add( 
+                new Vector2(sortedDownLeft[sortedDownLeft.Count-1].x, bottomPassageTilemap.CellToWorld(new(leftPassageTilemap.cellBounds.yMin, 0, 0)).x));
+            
+            sortedDownLeft
+               .Add(leftPassageTilemap.CellToWorld(new(leftPassageTilemap.cellBounds.xMin + 1, leftPassageTilemap.cellBounds.yMin, 0)));
+            
+            sortedDownLeft
+                .Add(new Vector2(leftPassageTilemap.CellToWorld(new Vector3Int(leftPassageTilemap.cellBounds.xMin + 1, 0)).x, bottomPassageTilemap.CellToWorld(new Vector3Int(0, bottomPassageTilemap.cellBounds.yMin + 1)).y));
+
+            // //finish
+            // for (int i = sortedDownLeft.Count-1; i >= 0; i--)
+            // {
+            //     sortedDownLeft.Add(sortedDownLeft[i] + new Vector2(0.1f, 0.1f));
+            // }
+            
+            collider.transform.position += new Vector3(0, 0, 0);
+            collider.points = sortedDownLeft.ToArray();
+
+            Vector2 Find(Func<Vector2, Vector2, bool> comparator, Vector2[] points)
+            {
+                Vector2 best = points[0];
+                
+                foreach (var point in points)
+                {
+                    if (comparator.Invoke(point, best))
+                    {
+                        best = point;
+                    }
+                }
+
+                return best;
+            }
+            
+            Vector2 FindWithMinDistance(Vector2 start, Vector2[] points)
+            {
+                Vector2 best = points[0];
+
+                for (int i = 0; i < points.Length; i++)
+                {
+                    if (Vector2.Distance(points[i], start) < Vector2.Distance(start, best))
+                        best = points[i];
+                }
+
+                return best;
+            }
             bool CheckTile(Vector3Int position)
             {
                 if(mainMap.GetTile(position + Vector3Int.up) != null && 
@@ -209,7 +308,43 @@ namespace rainy_morning
                         (Vector2) mainMap.CellToWorld(new Vector3Int(mainMap.cellBounds.xMin, mainMap.cellBounds.yMax)),
                     };
             }
+            Vector3 GetOffset(Vector3Int position)
+            {
+                if (mainMap.GetTile(position + Vector3Int.up) != null &&
+                    mainMap.GetTile(position + Vector3Int.left) != null &&
+                    mainMap.GetTile(position + Vector3Int.right) == null)
+                    return Vector3.right;
+                
+                else if (mainMap.GetTile(position + Vector3Int.down) != null &&
+                    mainMap.GetTile(position + Vector3Int.left) != null &&
+                    mainMap.GetTile(position + Vector3Int.right) == null)
+                    return Vector3.right + Vector3Int.up;
+                
+                else if (mainMap.GetTile(position + Vector3Int.right) != null &&
+                         mainMap.GetTile(position + Vector3Int.left) == null &&
+                         mainMap.GetTile(position + Vector3Int.up) == null &&
+                         mainMap.GetTile(position + Vector3Int.down) != null)
+                    return Vector3.up;
+                
+                else if (mainMap.GetTile(position + Vector3Int.right) != null && 
+                         mainMap.GetTile(position + Vector3Int.left) != null && 
+                         mainMap.GetTile(position + Vector3Int.up) == null )
+                    return Vector3Int.up + Vector3Int.right / 2;
+                
+                else if (mainMap.GetTile(position + Vector3Int.right) != null && 
+                         mainMap.GetTile(position + Vector3Int.left) != null && 
+                         mainMap.GetTile(position + Vector3Int.down) == null)
+                    return Vector3.right / 2;
+                
+                else if (mainMap.GetTile(position + Vector3Int.up) != null && 
+                         mainMap.GetTile(position + Vector3Int.down) != null)
+                    return Vector3.up / 2;
+
+                return Vector3Int.zero;
+            }
         }
+
+
 
         private void RefreshFactories()
         {
@@ -369,23 +504,23 @@ namespace rainy_morning
         private void UpdateFactoriesPositions()
         {
             UpdateFactoryFor(leftPassageTilemap, 
-                bounds => new Vector3Int(bounds.xMin + 1, bounds.yMax), 
-                bounds => new Vector3Int(bounds.xMin + 1, bounds.yMin), 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMax), 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMin), 
                 false);
             
             UpdateFactoryFor(rightPassageTilemap, 
-                bounds => new Vector3Int(bounds.xMax - 1, bounds.yMax), 
-                bounds => new Vector3Int(bounds.xMax - 1, bounds.yMin), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMax), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMin), 
                 false);
   
             UpdateFactoryFor(topPassageTilemap, 
-                bounds => new Vector3Int(bounds.xMin, bounds.yMax - 1), 
-                bounds => new Vector3Int(bounds.xMax, bounds.yMax - 1), 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMax), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMax), 
                 true);
 
             UpdateFactoryFor(bottomPassageTilemap, 
-                bounds => new Vector3Int(bounds.xMin, bounds.yMin + 1), 
-                bounds => new Vector3Int(bounds.xMax, bounds.yMin + 1), 
+                bounds => new Vector3Int(bounds.xMin, bounds.yMin), 
+                bounds => new Vector3Int(bounds.xMax, bounds.yMin), 
                 true);
 
             RefreshFactories();

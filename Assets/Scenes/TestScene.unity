@@ -224,10 +224,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.004166667
-    y: 0.0041666664
-    width: 0.99166673
-    height: 0.9916667
+    x: 0.0014534884
+    y: 0
+    width: 1
+    height: 1.2121212
   near clip plane: 0.1
   far clip plane: 5000
   field of view: 40
@@ -572,7 +572,7 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
