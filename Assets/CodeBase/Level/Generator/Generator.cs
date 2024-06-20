@@ -69,6 +69,11 @@ namespace destructive_code.LevelGeneration
 
             foreach (var room in _spawnedRooms)
                 room.PassageHandler.CloseAllFree();
+
+            foreach (var room in _spawnedRooms)
+            {
+                room.OnFinish();
+            }
         }
 
         public void AddSpawnedRoom(RoomBase room)

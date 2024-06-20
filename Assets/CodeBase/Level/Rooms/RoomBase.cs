@@ -23,11 +23,17 @@ namespace destructive_code.LevelGeneration
             InitPassageHandler();
 
             var root = new RoomRoot(this);
-            root.Construct();
+            root.ConstructInPrefab();
 
             CameraManager = new RoomCameraManager(this.transform);
             
             Initialized = true;
+        }
+
+        public void OnFinish()
+        {
+            var root = new RoomRoot(this);
+            root.ConstructOnFinish();
         }
 
         private void InitPassageHandler() 

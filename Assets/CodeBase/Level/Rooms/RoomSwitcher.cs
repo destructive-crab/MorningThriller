@@ -13,7 +13,7 @@ namespace destructive_code.LevelGeneration
 
         private void Start()
         {
-            player = GetComponent<Player>();
+            player = GetComponentInParent<Player>();
             levelScene = SceneSwitcher.LevelScene;
         }
 
@@ -61,18 +61,18 @@ namespace destructive_code.LevelGeneration
         private IEnumerator MovePlayer(Vector3 direction)
         {
             entered = false;
-            
+
             while (!entered)
             {
-                player.transform.position += direction * 0.1f;
+                player.body.MovePosition(transform.position + direction * 0.15f);
                 yield return new WaitForFixedUpdate();
             }
-
+            
             Vector3 startPosition = player.transform.position;
 
             while (Vector3.Distance(startPosition, player.transform.position) < 1.5f)
             {
-                player.transform.position += direction * 0.05f;
+                player.body.MovePosition(transform.position + direction * 0.05f);
                 yield return new WaitForFixedUpdate();
             }               
              

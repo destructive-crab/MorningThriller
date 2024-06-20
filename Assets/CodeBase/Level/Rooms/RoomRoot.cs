@@ -9,7 +9,7 @@ namespace destructive_code.LevelGeneration
             this.room = room;
         }
 
-        public void Construct()
+        public void ConstructInPrefab()
         {
             var passageHandler = room.GetComponentInChildren<PassageHandler>();
 
@@ -18,5 +18,12 @@ namespace destructive_code.LevelGeneration
             
             passageHandler.OpenAllDoors();
         }
+
+        public void ConstructOnFinish()
+        {
+            var roomCollision = new RoomCollision(room);
+            roomCollision.Generate();
+        }
+        
     }
 }
