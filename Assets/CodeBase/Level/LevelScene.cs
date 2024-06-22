@@ -1,5 +1,6 @@
+using destructive_code.InputManagement;
 using destructive_code.LevelGeneration.CameraManagement;
-using destructive_code.LevelGeneration.PlayerCode;
+using destructive_code.PlayerCodeBase;
 using destructive_code.Scenes;
 using destructive_code.Tests;
 using UnityEngine;
@@ -9,9 +10,11 @@ namespace destructive_code.LevelGeneration
     public class LevelScene : Scene
     {
         public Level Level { get; private set; }
-        public Player Player { get; private set; }
+        public PlayerDummy PlayerDummy { get; private set; }
         public CameraSwitcher CameraSwitcher { get; private set; }
 
+        public readonly IInputService InputService = new DesktopInputService();
+        
         protected LevelConfig config;
 
         public LevelScene(LevelConfig config)
@@ -40,8 +43,10 @@ namespace destructive_code.LevelGeneration
             
             Level.Generator.Generate(container, Level);
 
-            Player = GameObject.FindObjectOfType<Player>();
+            PlayerDummy = GameObject.FindObjectOfType<PlayerDummy>();
             CameraSwitcher = new CameraSwitcher();
+            
+            InputService.SwitchToPlayerInputs();
         }
     }
 }
