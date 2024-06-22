@@ -1,12 +1,13 @@
+using destructive_code.LevelGeneration;
 using Internal.Enemies;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace destructive_code.LevelGeneration.PlayerCode
+namespace destructive_code.PlayerCodeBase
 {
     [RequireComponent(typeof(Flipper))]
-    public sealed class Player : DepressedBehaviour
+    public sealed class PlayerDummy : DepressedBehaviour
     {
         public AnimatorController side;
         public AnimatorController front;

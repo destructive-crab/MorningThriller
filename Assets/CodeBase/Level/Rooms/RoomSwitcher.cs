@@ -1,5 +1,5 @@
 using System.Collections;
-using destructive_code.LevelGeneration.PlayerCode;
+using destructive_code.PlayerCodeBase;
 using destructive_code.Scenes;
 using UnityEngine;
 
@@ -7,13 +7,13 @@ namespace destructive_code.LevelGeneration
 {
     public sealed class RoomSwitcher : DepressedBehaviour
     {
-        private Player player;
+        private PlayerRoot _playerDummy;
         private bool entered = false;
         private LevelScene levelScene;
 
         private void Start()
         {
-            player = GetComponentInParent<Player>();
+            _playerDummy = GetComponentInParent<PlayerRoot>();
             levelScene = SceneSwitcher.LevelScene;
         }
 
@@ -21,9 +21,10 @@ namespace destructive_code.LevelGeneration
         {
             if (other.TryGetComponent(out RoomBase roomBase))
             {
-                player.Disable();
+                //TODO: INPUTS DISABLE
+                
                 levelScene.CameraSwitcher.Transition.Enable();
-                var passage = roomBase.PassageHandler.FitIn(player.transform);
+                var passage = roomBase.PassageHandler.FitIn(_playerDummy.transform);
 
                 if (passage.Direction == Direction.Top)
                 {
@@ -50,7 +51,7 @@ namespace destructive_code.LevelGeneration
             {
                 levelScene.CameraSwitcher.Transition.Disable();
                 
-                roomBase.CameraManager.VirtualCamera.Follow = player.transform;
+                roomBase.CameraManager.VirtualCamera.Follow = _playerDummy.transform;
                 
                 levelScene.CameraSwitcher.SwitchTo(roomBase.CameraManager.VirtualCamera);
                 
@@ -64,19 +65,19 @@ namespace destructive_code.LevelGeneration
 
             while (!entered)
             {
-                player.body.MovePosition(transform.position + direction * 0.15f);
+                //_playerDummy.body.MovePosition(transform.position + direction * 0.15f);
                 yield return new WaitForFixedUpdate();
             }
             
-            Vector3 startPosition = player.transform.position;
+            Vector3 startPosition = _playerDummy.transform.position;
 
-            while (Vector3.Distance(startPosition, player.transform.position) < 1.5f)
+            while (Vector3.Distance(startPosition, _playerDummy.transform.position) < 1.5f)
             {
-                player.body.MovePosition(transform.position + direction * 0.05f);
+              //  _playerDummy.body.MovePosition(transform.position + direction * 0.05f);
                 yield return new WaitForFixedUpdate();
             }               
              
-            player.Enable();
+            //_playerDummy.Enable();
         }
     }
 }

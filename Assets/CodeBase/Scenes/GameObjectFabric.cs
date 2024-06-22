@@ -42,13 +42,34 @@ namespace destructive_code.Scenes
             if (instance is GameObject gameObject)
             {
                 OnInstantiatedGO?.Invoke(gameObject);
+                
+                InitLevelScene(gameObject);
             }
             else if (instance is Component component)
             {
                 OnInstantiatedGO?.Invoke(component.gameObject);
+                
+                if(component is DepressedBehaviour depressedBehaviour)
+                {
+                    depressedBehaviour.SetLevelScene(SceneSwitcher.LevelScene);
+                }
+                else
+                {
+                    InitLevelScene(component.gameObject);
+                }
             }
 
-            return instance;   
+            return instance;
+
+            void InitLevelScene(GameObject gameObject)
+            {
+                var behaviours = gameObject.GetComponents<DepressedBehaviour>();
+
+                foreach (var behaviour in behaviours)
+                {
+                    behaviour.SetLevelScene(SceneSwitcher.LevelScene);
+                }
+            }
         }
 
         public virtual async void Destroy(GameObject gameObject)

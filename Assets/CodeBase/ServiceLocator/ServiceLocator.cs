@@ -1,32 +1,35 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace destructive_code.ServiceLocators
 {
-    public class ServiceLocator<TService>
-        where TService : class
+    public class ServiceLocator<TServiceBase>
+        where TServiceBase : class
     {
-        private readonly Dictionary<Type, TService> services = new ();
+        private readonly Dictionary<Type, TServiceBase> services = new ();
 
-        public bool Contains<TServiceEnquire>() where TServiceEnquire : class => services.ContainsKey(typeof(TServiceEnquire));
+        public bool Contains<TService>() where TService : TServiceBase => services.ContainsKey(typeof(TService));
         
-        public TServiceEnquire Get<TServiceEnquire>() where TServiceEnquire : class => services[typeof(TServiceEnquire)] as TServiceEnquire;
+        public TService Get<TService>() where TService : class, TServiceBase => services[typeof(TService)] as TService;
         
-        public bool TryGet<TServiceEnquire>(out TServiceEnquire serviceEnquire)
-            where TServiceEnquire : class 
+        public bool TryGet<TService>(out TService serviceEnquire)
+            where TService : class, TServiceBase
         {
-            serviceEnquire = services[typeof(TServiceEnquire)] as TServiceEnquire;
+            serviceEnquire = services[typeof(TService)] as TService;
             return serviceEnquire != null;
         }
 
-        public ServiceLocator<TService> Register(TService service)
+        public ServiceLocator<TServiceBase>Register<TService>(TService service)
+            where TService : TServiceBase
         {
             services.TryAdd(service.GetType(), service);
             
             return this;
         }
         
-        public ServiceLocator<TService> Unregister(TService service)
+        public ServiceLocator<TServiceBase> Unregister<TService>(TService service)
+            where TService : TServiceBase
         {
             if (services.ContainsKey(service.GetType()))
                 services.Remove(service.GetType());
