@@ -41,7 +41,7 @@ namespace Internal.Enemies
         {
             if (!FaceToRight)
             {
-                spriteRenderer.flipX = !spriteRenderer.flipX;
+                transform.localScale = new Vector3(-1, 1, 1);
                 FaceToRight = true;
             }
         }
@@ -50,7 +50,7 @@ namespace Internal.Enemies
         {
             if (FaceToRight)
             {
-                spriteRenderer.flipX = !spriteRenderer.flipX;
+                transform.localScale = new Vector3(1, 1, 1);
                 FaceToRight = false;
             }
         }

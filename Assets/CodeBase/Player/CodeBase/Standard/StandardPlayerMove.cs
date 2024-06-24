@@ -7,7 +7,8 @@ namespace destructive_code.PlayerCodeBase.Standard
 {
     public class StandardPlayerMove : PlayerMove
     {
-        public override Type[] CanBeEnteredFrom => Array.Empty<Type>();
+        public override Type[] CanBeEnteredOnlyFrom => Array.Empty<Type>();
+        public override Type[] CannotBeEnteredFrom => Array.Empty<Type>();
         public override bool AllowRepeats => false;
 
         public override void FixedUpdate(PlayerRoot playerRoot)
@@ -15,9 +16,9 @@ namespace destructive_code.PlayerCodeBase.Standard
             playerRoot.CachedComponents.Get<Animator>().Play("Run");
             
             playerRoot.CachedComponents.Get<Rigidbody2D>().velocity =
-                SceneSwitcher.LevelScene.InputService.GetMovement();
+                Game.LevelScene.InputService.GetMovement();
             
-            Debug.Log(SceneSwitcher.LevelScene.InputService.GetMovement());
+            Debug.Log(Game.LevelScene.InputService.GetMovement());
         }
     }
 }

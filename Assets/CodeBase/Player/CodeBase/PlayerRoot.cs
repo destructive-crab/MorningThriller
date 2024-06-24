@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using destructive_code.PlayerCodeBase.CommonStates;
-using destructive_code.ServiceLocators;
-using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 namespace destructive_code.PlayerCodeBase
 {
@@ -14,19 +11,14 @@ namespace destructive_code.PlayerCodeBase
         public bool IsIdle => CurrentState is PlayerIdle;
         public bool IsMoving => CurrentState is PlayerMove;
         public bool IsRolling => CurrentState is PlayerRoll;
-
-        public readonly ServiceLocator<Component> CachedComponents = new ServiceLocator<Component>();
-
-        private PlayerStateFactory idleFactory;
-        private PlayerStateFactory moveFactory;
-        private PlayerStateFactory rollFactory;
-
+        
         private readonly Dictionary<Type, PlayerStateFactory> stateFactories = new Dictionary<Type, PlayerStateFactory>();
 
         protected abstract void InitializeComponents();
+        protected virtual void InitializeExtensions() { }
         protected abstract void InitializeStates();
         protected abstract void FinishInitialization();
-        
+
         protected virtual void UpdateInheritor() {}
         protected virtual void FixedUpdateInheritor() {}
         protected virtual void OnEnableInheritor() {}
@@ -35,32 +27,49 @@ namespace destructive_code.PlayerCodeBase
         private void OnEnable()
         {
             CurrentState?.Enter(this);
+            ExtensionContainer.EnableContainer();
+            
             OnEnableInheritor();
         }
 
         private void OnDisable()
         {
             CurrentState?.Exit(this);
+            ExtensionContainer.DisableContainer();
+            
             OnDisableInheritor();
         }
 
         private void Start()
         {
             InitializeComponents();
+            InitializeExtensions();
             InitializeStates();
             FinishInitialization();
+            
+            ExtensionContainer.StartContainer(this);
         }
 
         private void Update()
         {
             CurrentState?.Update(this);
+            ExtensionContainer.UpdateContainer();
+            
             UpdateInheritor();
         }
 
         private void FixedUpdate()
         {
             CurrentState?.FixedUpdate(this);
+            ExtensionContainer.FixedUpdateContainer();
+            
             FixedUpdateInheritor();
+        }
+
+        protected PlayerStateFactory GetFactory<TFactory>()
+            where TFactory : PlayerState
+        {
+            return stateFactories[typeof(TFactory)]; 
         }
 
         public void OverrideFactory<TFactory>(PlayerStateFactory factory)
@@ -76,12 +85,6 @@ namespace destructive_code.PlayerCodeBase
             }
         }
 
-        public PlayerStateFactory GetFactory<TFactory>()
-            where TFactory : PlayerState
-        {
-            return stateFactories[typeof(TFactory)]; 
-        }
-        
         public TState Get<TState>()
             where TState : PlayerState
         {
@@ -104,10 +107,8 @@ namespace destructive_code.PlayerCodeBase
                 CurrentState.Enter(this);
             }
         }
+        
         private bool IsAvailable(PlayerState state)
-        {
-            return state != null && !(CurrentState != null && CurrentState.GetType() == state.GetType() && CurrentState.AllowRepeats) && (CurrentState == null || state.CanBeEnteredFrom.Contains<Type>(CurrentState.GetType()) ||
-                                     state.CanBeEnteredFrom.Length == 0);
-        }
+            => state != null && (CurrentState == null || (CurrentState != null && CurrentState.CanEnterFrom(state.GetType())));
     }
 }

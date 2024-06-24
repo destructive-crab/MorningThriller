@@ -1,18 +1,23 @@
 using System;
 using destructive_code.LevelGeneration;
-using destructive_code.SceneLoader;    
+using destructive_code.SceneLoader;
+using destructive_code.ServiceLocators;
 
 namespace destructive_code.Scenes
 {
-    public static class SceneSwitcher
+    public static class Game
     {
         public static bool IsSceneLoaded { get; private set; }
+        public static bool IsOnLevelScene => LevelScene != null;
+        
         public static Scene CurrentScene { get; private set; }
         public static LevelScene LevelScene => CurrentScene as LevelScene;
- 
+
         public static event Action<Scene> OnSceneStartedLoading; //prev
         public static event Action<Scene, Scene> OnSceneLoaded; //prev/new
 
+        public static readonly GlobalServiceLocator GlobalServiceLocator = new GlobalServiceLocator();
+        
         private static readonly AsyncSceneLoader Loader = new();
         
         public static void SwitchTo<TScene>(TScene scene)

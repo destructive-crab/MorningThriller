@@ -11,7 +11,7 @@ namespace destructive_code
         
         private void Start()
         {
-            SceneSwitcher.SwitchTo(new LevelScene(Level));
+            Game.SwitchTo(new LevelScene(Level));
         }
     }
 }

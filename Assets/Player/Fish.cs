@@ -1,4 +1,3 @@
-using destructive_code.LevelGeneration;
 using destructive_code.PlayerCodeBase;
 using destructive_code.PlayerCodeBase.CommonStates;
 using destructive_code.PlayerCodeBase.Standard;
@@ -12,10 +11,11 @@ namespace destructive_code.Player
     {
         protected override void InitializeComponents()
         {
-            SetLevelScene(SceneSwitcher.LevelScene);
+            SetLevelScene(Game.LevelScene);
             
             CachedComponents
                 .Register(GetComponent<Rigidbody2D>())
+                .Register(GetComponentInChildren<SpriteRenderer>())
                 .Register(GetComponentInChildren<Animator>());
         }
 
@@ -25,9 +25,7 @@ namespace destructive_code.Player
             OverrideFactory<PlayerIdle>(new StandardStateFactory<StandardPlayerIdle>());
         }
 
-        protected override void FinishInitialization()
-        {
-        }
+        protected override void FinishInitialization() { }
 
         protected override void UpdateInheritor()
         {
@@ -35,9 +33,21 @@ namespace destructive_code.Player
             {
                 EnterState(GetFactory<PlayerMove>().GetState());
             }
-            else if(LevelScene.InputService.GetMovement() == Vector2.zero && IsMoving)
+            else if(LevelScene.InputService.GetMovement() == Vector2.zero && !IsIdle)
             {
                 EnterState(GetFactory<PlayerIdle>().GetState());   
+            }
+            
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                if(ExtensionContainer.HasExtension<RainbowExtension>())
+                {
+                    ExtensionContainer.RemoveExtension<RainbowExtension>();
+                }
+                else
+                {
+                    ExtensionContainer.AddExtension(new RainbowExtension());
+                }
             }
         }
     }

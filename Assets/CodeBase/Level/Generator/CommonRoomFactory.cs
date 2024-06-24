@@ -25,7 +25,7 @@ namespace destructive_code.LevelGeneration
 
         private void Awake()
         {
-            level = SceneSwitcher.LevelScene.Level;
+            level = Game.LevelScene.Level;
         }
 
         public override void Init(RoomBase owner)
@@ -63,7 +63,7 @@ namespace destructive_code.LevelGeneration
 
         private RoomBase SpawnRoom(RoomBase roomToSpawn)
         {
-            var spawnedRoom = SceneSwitcher.CurrentScene.Fabric
+            var spawnedRoom = Game.CurrentScene.Fabric
                 .Instantiate<RoomBase>(roomToSpawn, GetPosition(roomToSpawn), Quaternion.identity);
             
             return spawnedRoom;

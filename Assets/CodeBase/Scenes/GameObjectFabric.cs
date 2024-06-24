@@ -51,7 +51,7 @@ namespace destructive_code.Scenes
                 
                 if(component is DepressedBehaviour depressedBehaviour)
                 {
-                    depressedBehaviour.SetLevelScene(SceneSwitcher.LevelScene);
+                    depressedBehaviour.SetLevelScene(Game.LevelScene);
                 }
                 else
                 {
@@ -67,7 +67,7 @@ namespace destructive_code.Scenes
 
                 foreach (var behaviour in behaviours)
                 {
-                    behaviour.SetLevelScene(SceneSwitcher.LevelScene);
+                    behaviour.SetLevelScene(Game.LevelScene);
                 }
             }
         }

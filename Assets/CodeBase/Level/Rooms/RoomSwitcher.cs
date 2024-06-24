@@ -14,7 +14,7 @@ namespace destructive_code.LevelGeneration
         private void Start()
         {
             _playerDummy = GetComponentInParent<PlayerRoot>();
-            levelScene = SceneSwitcher.LevelScene;
+            levelScene = Game.LevelScene;
         }
 
         private void OnTriggerExit2D(Collider2D other)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace destructive_code.ServiceLocators
 {
-    public class ServiceLocator<TServiceBase>
+    public class LocalServiceLocator<TServiceBase>
         where TServiceBase : class
     {
         private readonly Dictionary<Type, TServiceBase> services = new ();
@@ -20,7 +20,7 @@ namespace destructive_code.ServiceLocators
             return serviceEnquire != null;
         }
 
-        public ServiceLocator<TServiceBase>Register<TService>(TService service)
+        public LocalServiceLocator<TServiceBase>Register<TService>(TService service)
             where TService : TServiceBase
         {
             services.TryAdd(service.GetType(), service);
@@ -28,7 +28,7 @@ namespace destructive_code.ServiceLocators
             return this;
         }
         
-        public ServiceLocator<TServiceBase> Unregister<TService>(TService service)
+        public LocalServiceLocator<TServiceBase> Unregister<TService>(TService service)
             where TService : TServiceBase
         {
             if (services.ContainsKey(service.GetType()))

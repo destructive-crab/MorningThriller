@@ -23,7 +23,7 @@ namespace destructive_code.LevelGeneration
             var roomQueue = new Queue<RoomBase>();
             var startRoomPrefab = level.GetRandomRoomFor(RoomType.StartRoom, Direction.Bottom);
 
-            var startRoom = SceneSwitcher.CurrentScene.Fabric
+            var startRoom = Game.CurrentScene.Fabric
                 .Instantiate<RoomBase>(startRoomPrefab, Vector3.zero, Quaternion.identity);
 
             roomQueue.Enqueue(startRoom);
