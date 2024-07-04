@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using destructive_code.Scenes;
+using MothDIed;
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     [RequireComponent(typeof(Passage))]
     public class CommonRoomFactory : RoomFactory
@@ -64,7 +64,7 @@ namespace destructive_code.LevelGeneration
         private RoomBase SpawnRoom(RoomBase roomToSpawn)
         {
             var spawnedRoom = Game.CurrentScene.Fabric
-                .Instantiate<RoomBase>(roomToSpawn, GetPosition(roomToSpawn), Quaternion.identity);
+                .Instantiate(roomToSpawn, GetPosition(roomToSpawn), Quaternion.identity);
             
             return spawnedRoom;
         }

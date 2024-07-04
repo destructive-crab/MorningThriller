@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace destructive_code.InputManagement
+namespace MorningThriller.InputManagement
 {
     public interface IInputService
     {

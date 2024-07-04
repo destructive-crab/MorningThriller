@@ -1,21 +1,21 @@
-using destructive_code.InputManagement;
-using destructive_code.LevelGeneration.CameraManagement;
-using destructive_code.PlayerCodeBase;
-using destructive_code.Scenes;
-using destructive_code.Tests;
+using MorningThriller.InputManagement;
+using MorningThriller.LevelGeneration.CameraManagement;
+using MorningThriller.PlayerLogic;
+using MorningThriller.Tests;
+using MothDIed.Scenes;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     public class LevelScene : Scene
     {
         public Level Level { get; private set; }
-        public PlayerDummy PlayerDummy { get; private set; }
+        public PlayerRoot Player { get; private set; }
         public CameraSwitcher CameraSwitcher { get; private set; }
 
         public readonly IInputService InputService = new DesktopInputService();
         
-        protected LevelConfig config;
+        protected readonly LevelConfig config;
 
         public LevelScene(LevelConfig config)
         {
@@ -43,7 +43,7 @@ namespace destructive_code.LevelGeneration
             
             Level.Generator.Generate(container, Level);
 
-            PlayerDummy = GameObject.FindObjectOfType<PlayerDummy>();
+            Player = GameObject.FindObjectOfType<PlayerRoot>();
             CameraSwitcher = new CameraSwitcher();
             
             InputService.SwitchToPlayerInputs();

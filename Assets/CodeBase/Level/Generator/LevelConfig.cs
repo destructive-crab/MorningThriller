@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     [CreateAssetMenu]
     public sealed class LevelConfig : ScriptableObject

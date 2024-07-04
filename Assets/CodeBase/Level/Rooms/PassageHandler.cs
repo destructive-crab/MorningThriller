@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using NaughtyAttributes;
+using MothDIed;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     [RequireComponent(typeof(RoomBase))]
     public sealed class PassageHandler : DepressedBehaviour

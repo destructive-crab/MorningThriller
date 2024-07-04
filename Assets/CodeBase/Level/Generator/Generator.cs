@@ -1,8 +1,10 @@
 using System.Collections.Generic;
-using destructive_code.Scenes;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using MothDIed;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     public sealed class Generator
     {
@@ -18,13 +20,12 @@ namespace destructive_code.LevelGeneration
         {
             this.container = container;
             
-            var mustSpawnQueue = new Queue<RoomBase>();
+            Queue<RoomBase> mustSpawnQueue = new Queue<RoomBase>();
             
-            var roomQueue = new Queue<RoomBase>();
-            var startRoomPrefab = level.GetRandomRoomFor(RoomType.StartRoom, Direction.Bottom);
+            Queue<RoomBase> roomQueue = new Queue<RoomBase>();
+            RoomBase startRoomPrefab = level.GetRandomRoomFor(RoomType.StartRoom, Direction.Bottom);
 
-            var startRoom = Game.CurrentScene.Fabric
-                .Instantiate<RoomBase>(startRoomPrefab, Vector3.zero, Quaternion.identity);
+            RoomBase startRoom = Game.CurrentScene.Fabric.Instantiate(startRoomPrefab, Vector3.zero, Quaternion.identity);
 
             roomQueue.Enqueue(startRoom);
             AddSpawnedRoom(startRoom);

@@ -1,9 +1,9 @@
 using System;
-using Unity.Collections;
+using MothDIed;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     public sealed class Passage : DepressedBehaviour
     {

@@ -1,7 +1,7 @@
 using Cinemachine;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration.CameraManagement
+namespace MorningThriller.LevelGeneration.CameraManagement
 {
     public sealed class RoomCameraManager
     {

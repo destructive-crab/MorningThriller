@@ -1,8 +1,9 @@
 using Internal.Enemies;
+using MothDIed;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace destructive_code.Player
+namespace MorningThriller.Player
 {
     [RequireComponent(typeof(Animator))]
     public sealed class AnimatorSwitcher : DepressedBehaviour

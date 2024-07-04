@@ -1,9 +1,9 @@
 using System.Collections;
-using destructive_code.PlayerCodeBase;
-using destructive_code.Scenes;
+using MorningThriller.PlayerLogic;
+using MothDIed;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     public sealed class RoomSwitcher : DepressedBehaviour
     {

@@ -1,8 +1,7 @@
 using System;
-using destructive_code.LevelGeneration;
-using UnityEngine;
+using MorningThriller.LevelGeneration;
 
-namespace destructive_code.Tests
+namespace MorningThriller.Tests
 {
     public class TestLevel : LevelGeneration.Level
     {

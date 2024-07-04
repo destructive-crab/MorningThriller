@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace destructive_code.InputManagement
+namespace MorningThriller.InputManagement
 {
     public sealed class DesktopInputService : IInputService
     {

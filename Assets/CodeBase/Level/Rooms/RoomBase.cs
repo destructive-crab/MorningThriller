@@ -1,7 +1,8 @@
-using destructive_code.LevelGeneration.CameraManagement;
+using MorningThriller.LevelGeneration.CameraManagement;
+using MothDIed;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     [RequireComponent(typeof(PassageHandler))]
     public class RoomBase : DepressedBehaviour

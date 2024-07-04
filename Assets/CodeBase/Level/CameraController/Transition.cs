@@ -1,7 +1,8 @@
 using Cysharp.Threading.Tasks;
+using MothDIed;
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration.CameraManagement
+namespace MorningThriller.LevelGeneration.CameraManagement
 {
     [RequireComponent(typeof(Animator))]
     public sealed class Transition : DepressedBehaviour

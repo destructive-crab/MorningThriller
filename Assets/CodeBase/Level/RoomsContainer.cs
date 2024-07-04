@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace destructive_code.LevelGeneration
+namespace MorningThriller.LevelGeneration
 {
     public sealed class RoomsContainer : MonoBehaviour { }
 }

@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace destructive_code.InputManagement
+namespace MorningThriller.InputManagement
 {
     public partial class @InputMap: IInputActionCollection2, IDisposable
     {
