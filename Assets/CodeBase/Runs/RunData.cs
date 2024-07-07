@@ -1,5 +1,5 @@
 using MorningThriller.PlayerLogic;
-using Newtonsoft.Json;
+using UnityEngine;
 
 namespace MorningThriller.GameLoop
 {
@@ -7,16 +7,30 @@ namespace MorningThriller.GameLoop
     {
         public PlayerData PlayerData { get; private set; }
 
+        private readonly string storagePath;
+        private FileDataHandler dataHandler;
+
+        public RunData()
+        {
+            storagePath = Application.persistentDataPath;
+            dataHandler = new FileDataHandler(storagePath, "CurrentRun");
+            
+            Load();
+        }
+
         public void Save()
         {
-            string data = JsonConvert.SerializeObject(PlayerData);
-            
-            
+            dataHandler.Save(PlayerData);
         }
         
         public void Load() 
         {
-        
+            PlayerData = dataHandler.Load<PlayerData>();
+
+            if (PlayerData == null)
+            {
+                PlayerData = new PlayerData();
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MothDIed
     {
         public static bool IsSceneLoaded { get; private set; }
 
-        public static RunData RunData { get; private set; }
+        public static RunData RunData { get; private set; } = new();
         
         public static Scene CurrentScene { get; private set; }
         public static LevelScene LevelScene  => CurrentScene as LevelScene;

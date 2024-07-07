@@ -24,7 +24,7 @@ namespace MorningThriller.LevelGeneration
 
         public override string GetSceneName()
         {
-            return "TestScene";
+            return "Level";
         }
 
         public override Camera GetCamera()

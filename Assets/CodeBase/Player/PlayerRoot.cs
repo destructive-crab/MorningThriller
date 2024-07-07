@@ -11,7 +11,7 @@ namespace MorningThriller.PlayerLogic
 
         public bool IsIdle => CurrentState is PlayerIdle;
         public bool IsMoving => CurrentState is PlayerMove;
-        public bool IsRolling => CurrentState is PlayerRoll;
+        public PlayerRoll IsRolling => CurrentState as PlayerRoll;
         
         private readonly Dictionary<Type, PlayerStateFactory> stateFactories = new Dictionary<Type, PlayerStateFactory>();
 

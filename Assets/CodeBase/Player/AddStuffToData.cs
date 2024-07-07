@@ -11,7 +11,9 @@ namespace MorningThriller.PlayerLogic
         public override void Update()
         {
             if(Input.GetKeyDown(KeyCode.Space))
-                Game.RunData.PlayerData.stuff.Add(UnityEngine.Random.Range(0, 999));
+            {
+                Game.RunData.PlayerData.stuff.Add(Random.Range(0, 999));
+            }
         }
     }
 }

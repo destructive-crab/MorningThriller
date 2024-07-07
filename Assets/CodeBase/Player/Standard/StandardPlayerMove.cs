@@ -17,8 +17,6 @@ namespace MorningThriller.PlayerLogic.Standard
             
             playerRoot.CachedComponents.Get<Rigidbody2D>().velocity =
                 Game.LevelScene.InputService.GetMovement();
-            
-            Debug.Log(Game.LevelScene.InputService.GetMovement());
         }
     }
 }

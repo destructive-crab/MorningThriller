@@ -1,4 +1,3 @@
-using MorningThriller.LevelGeneration;
 using MorningThriller.PlayerLogic;
 using MorningThriller.PlayerLogic.CommonStates;
 using MorningThriller.PlayerLogic.Standard;
@@ -29,17 +28,26 @@ namespace MorningThriller.Player
         {
             OverrideFactory<PlayerMove>(new StandardStateFactory<StandardPlayerMove>());
             OverrideFactory<PlayerIdle>(new StandardStateFactory<StandardPlayerIdle>());
+            OverrideFactory<PlayerRoll>(new StandardStateFactory<StandardPlayerRoll>());
         }
 
-        protected override void FinishInitialization() { }
+        protected override void FinishInitialization()
+        {
+            LevelScene.InputService.OnRoll += OnRoll;
+        }
+
+        private void OnRoll()
+        {
+            EnterState(GetFactory<PlayerRoll>().GetState());
+        }
 
         protected override void UpdateInheritor()
         {
-            if (LevelScene.InputService.GetMovement() != Vector2.zero && !IsMoving)
+            if (LevelScene.InputService.GetMovement() != Vector2.zero && !IsMoving && (IsRolling == null || !IsRolling.InProcess))
             {
                 EnterState(GetFactory<PlayerMove>().GetState());
             }
-            else if(LevelScene.InputService.GetMovement() == Vector2.zero && !IsIdle)
+            else if(LevelScene.InputService.GetMovement() == Vector2.zero && !IsIdle && (IsRolling == null || !IsRolling.InProcess))
             {
                 EnterState(GetFactory<PlayerIdle>().GetState());   
             }
