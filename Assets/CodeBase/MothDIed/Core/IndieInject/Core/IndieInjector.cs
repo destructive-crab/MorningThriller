@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MothDIed.ServiceLocators;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = MothDIed.Scenes.Scene;
@@ -111,7 +112,23 @@ namespace MothDIed.DI
 
         #region Inject
 
-        public void Inject(object toInject)
+        public void InjectWithBaseAnd(object toInject, params IServiceLocator[] serviceLocators)
+        {
+            List<IServiceLocator> locators = new List<IServiceLocator>();
+            
+            locators.Add(coreContainer);
+            locators.Add(sceneContainer);
+            locators.AddRange(serviceLocators);
+ 
+            InjectWith(toInject, locators.ToArray());
+        }
+
+        public void InjectWithBase(object toInject)
+        {   
+            InjectWith(toInject, coreContainer, sceneContainer);
+        }
+
+        public void InjectWith(object toInject, params IServiceLocator[] serviceLocators)
         {
             var type = toInject.GetType();
 
@@ -145,7 +162,7 @@ namespace MothDIed.DI
 
                         foreach (var parameter in requiredParameters)
                         {
-                            parameters.Add(Find(parameter.ParameterType).GetInstance());
+                            parameters.Add(FindIn(parameter.ParameterType, serviceLocators));
                         }
 
                         info.Invoke(toInject, parameters.ToArray());
@@ -164,7 +181,7 @@ namespace MothDIed.DI
                     {
                         if (attribute is not InjectAttribute) continue;
                         
-                        info.SetValue(toInject, Find(info.FieldType).GetInstance());
+                        info.SetValue(toInject, FindIn(info.FieldType, serviceLocators));
                     }
                 }
             }
@@ -180,7 +197,7 @@ namespace MothDIed.DI
                     {
                         if (attribute is not InjectAttribute) continue;
 
-                        info.SetValue(toInject, Find(info.PropertyType).GetInstance());
+                        info.SetValue(toInject, FindIn(info.PropertyType, serviceLocators));
                     }
                 }
             }
@@ -194,7 +211,7 @@ namespace MothDIed.DI
 
                 foreach (var monoBehaviour in allMonoBehaviours)
                 {
-                    Inject(monoBehaviour);
+                    InjectWithBase(monoBehaviour);
                 }
 
                 return true;
@@ -203,15 +220,21 @@ namespace MothDIed.DI
             return false;
         }
 
-        private Dependency Find(Type type)
+        private object FindIn(Type type, params IServiceLocator[] locators)
         {
-            if (coreContainer.Get(type) != null)
+            foreach (var locator in locators)
             {
-                return coreContainer.Get(type);
-            }
-            if (sceneContainer.Get(type) != null)
-            {
-                return sceneContainer.Get(type);
+                if (locator == null)
+                {
+                    throw new NullReferenceException(locator.ToString());
+                }
+
+                var possibleDependency = locator.Get(type);
+                
+                if (possibleDependency != null)
+                {
+                    return possibleDependency;
+                }
             }
 
             throw new IndieResolveException($"There is no dependency of type {type}");

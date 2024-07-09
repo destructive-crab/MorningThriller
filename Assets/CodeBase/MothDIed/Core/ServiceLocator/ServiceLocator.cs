@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MothDIed.ServiceLocators
 {
-    public class ServiceLocator<TServiceBase>
+    public class ServiceLocator<TServiceBase> : IServiceLocator
         where TServiceBase : class
     {
         private readonly Dictionary<Type, TServiceBase> services = new ();
@@ -11,14 +11,25 @@ namespace MothDIed.ServiceLocators
 
         public TServiceBase[] GetAll() => servicesList.ToArray();
         
-        public bool Contains<TService>() where TService : TServiceBase => services.ContainsKey(typeof(TService));
+        public bool Contains<TService>() where TService : class
+            => Contains(typeof(TService));
         
         public TService Get<TService>() where TService : class, TServiceBase
         {
-            if (!services.ContainsKey(typeof(TService)))
-                throw new Exception($"No service of type {typeof(TService)}");
+            return Get(typeof(TService)) as TService;
+        }
+
+        public bool Contains(Type serviceType)
+        {
+            return services.ContainsKey(serviceType);
+        }
+
+        public object Get(Type extensionType)
+        {
+            if (!services.ContainsKey(extensionType))
+                throw new Exception($"No service of type {extensionType}");
             
-            return services[typeof(TService)] as TService;
+            return services[extensionType];
         }
 
         public T[] GetAllOfType<T>() 

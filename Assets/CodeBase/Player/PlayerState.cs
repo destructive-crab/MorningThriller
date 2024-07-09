@@ -14,12 +14,20 @@ namespace MorningThriller.PlayerLogic
             {
                 return false;
             }
-
-            for (int i = 0; i < CanBeEnteredOnlyFrom.Length; i++)
+            
+            if(CanBeEnteredOnlyFrom.Length != 0)
             {
-                if (!(CanBeEnteredOnlyFrom[i] == type || type.IsSubclassOf(CanBeEnteredOnlyFrom[i])))
-                    return false;
+                bool has = false;
+                
+                for (int i = 0; i < CanBeEnteredOnlyFrom.Length; i++)
+                {
+                    if (CanBeEnteredOnlyFrom[i] == type || type.IsSubclassOf(CanBeEnteredOnlyFrom[i]))
+                        has = true;
+                }
+
+                return has;
             }
+
             for (int i = 0; i < CannotBeEnteredFrom.Length; i++)
             {
                 if (CannotBeEnteredFrom[i] == type || type.IsSubclassOf(CanBeEnteredOnlyFrom[i]))

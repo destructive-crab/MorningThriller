@@ -22,6 +22,7 @@ namespace MorningThriller.Player
         protected override void InitializeExtensions()
         {
             ExtensionContainer.AddExtension(new AddStuffToData());
+            ExtensionContainer.AddExtension(new PlayerAnimator());
         }
 
         protected override void InitializeStates()

@@ -8,11 +8,12 @@
 
 using System;
 using System.Collections.Generic;
+using MothDIed.ServiceLocators;
 using UnityEngine;
 
 namespace MothDIed.DI
 {
-    public sealed class DependenciesContainer : IDisposable
+    public sealed class DependenciesContainer : IDisposable, IServiceLocator
     {
         private readonly Dictionary<Type, Dependency> dependencies = new ();
 
@@ -24,12 +25,25 @@ namespace MothDIed.DI
             }
         }
 
-        public Dependency Get<TDependency>()
+        public bool Contains<TDependency>() where TDependency : class
         {
-            return dependencies[typeof(TDependency)];
+            return Contains(typeof(TDependency));
         }
 
-        public Dependency Get(Type type)
+        public bool Contains(Type dependencyType)
+        {
+            return dependencies.ContainsKey(dependencyType);
+        }
+
+        public object Get(Type extensionType)
+        {
+            if (!Contains(extensionType))
+                return null;
+            
+            return GetDependency(extensionType).GetInstance();
+        }
+
+        public Dependency GetDependency(Type type)
         {
             if (dependencies.TryGetValue(type, out var dependency))
             {
@@ -61,7 +75,7 @@ namespace MothDIed.DI
             {
                 if (dependencyPair.Value.IsSingleton)
                 {
-                    Game.Injector.Inject(dependencyPair.Value.GetInstance());
+                    Game.Injector.InjectWithBase(dependencyPair.Value.GetInstance());
                 }
             }
         }

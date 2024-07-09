@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using MorningThriller.PlayerLogic.CommonStates;
 using MothDIed;
+using MothDIed.ExtensionSystem;
 
 namespace MorningThriller.PlayerLogic
 {
@@ -14,7 +15,7 @@ namespace MorningThriller.PlayerLogic
         public PlayerRoll IsRolling => CurrentState as PlayerRoll;
         
         private readonly Dictionary<Type, PlayerStateFactory> stateFactories = new Dictionary<Type, PlayerStateFactory>();
-
+        
         protected abstract void InitializeComponents();
         protected virtual void InitializeExtensions() { }
         protected abstract void InitializeStates();
@@ -44,11 +45,14 @@ namespace MorningThriller.PlayerLogic
         private void Start()
         {
             InitializeComponents();
-            InitializeExtensions();
-            InitializeStates();
-            FinishInitialization();
             
             ExtensionContainer.StartContainer(this);
+            
+            InitializeExtensions();
+            
+            InitializeStates();
+            
+            FinishInitialization();
         }
 
         private void Update()
@@ -105,11 +109,29 @@ namespace MorningThriller.PlayerLogic
             {
                 CurrentState?.Exit(this);
                 CurrentState = state;
+                
+                Game.Injector.InjectWithBaseAnd(CachedComponents, ExtensionContainer);
+                
                 CurrentState.Enter(this);
             }
         }
         
         private bool IsAvailable(PlayerState state)
             => state != null && (CurrentState == null || (CurrentState != null && CurrentState.CanEnterFrom(state.GetType())));
+    }
+
+    public sealed class DepressedInjector
+    {
+        private readonly DepressedBehaviour depressedBehaviour;
+
+        public DepressedInjector(DepressedBehaviour depressedBehaviour)
+        {
+            this.depressedBehaviour = depressedBehaviour;
+        }
+
+        public void InjectExtension(Extension extension)
+        {
+            
+        }
     }
 }

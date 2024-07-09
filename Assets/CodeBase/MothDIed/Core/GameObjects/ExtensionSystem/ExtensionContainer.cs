@@ -1,31 +1,30 @@
 using System;
 using System.Collections.Generic;
+using MothDIed.ServiceLocators;
 using UnityEngine;
 
 namespace MothDIed.ExtensionSystem
 {
-    public sealed class ExtensionContainer
+    public sealed class ExtensionContainer : IServiceLocator
     {
         private DepressedBehaviour owner;
 
         private readonly Dictionary<Type, List<Extension>> extensions = new();
 
-        private bool containerStarted;
+        private bool containerStarted = false;
 
-        public void StartContainer(DepressedBehaviour owner, params Extension[] extensions)
+        public void StartContainer(DepressedBehaviour owner)
         {
             this.owner = owner;
-
-            foreach (Extension extension in extensions)
-            {
-                AddExtension(extension);
-            }
-
             containerStarted = true;
 
             foreach (var extension in this.extensions)
             {
-                extension.Value.ForEach((extension) => extension.StartExtension());
+                extension.Value.ForEach((extension) =>
+                {
+                    Game.Injector.InjectWithBaseAnd(extension, owner.CachedComponents);
+                    extension.StartExtension();
+                });
             }
         }
 
@@ -42,7 +41,7 @@ namespace MothDIed.ExtensionSystem
         public TExtension GetExtension<TExtension>()
             where TExtension : Extension
         {
-            return extensions[typeof(TExtension)][0] as TExtension;
+            return Get(typeof(TExtension)) as TExtension;
         }
 
         public TExtension[] GetExtensions<TExtension>()
@@ -50,13 +49,22 @@ namespace MothDIed.ExtensionSystem
         {
             return extensions[typeof(TExtension)].ToArray() as TExtension[];
         }
-        
-        public bool HasExtension<TExtension>()
-            where TExtension : Extension
+
+        public bool Contains<TExtension>() where TExtension : Extension
         {
-            return extensions.ContainsKey(typeof(TExtension));
+            return Contains(typeof(TExtension));
         }
 
+        public bool Contains(Type serviceType)
+        {
+            return extensions.ContainsKey(serviceType);
+        }
+
+        public object Get(Type extensionType)
+        {
+            return extensions[extensionType][0];
+        }
+        
         #endregion
 
         #region Extensions Managment
@@ -81,10 +89,11 @@ namespace MothDIed.ExtensionSystem
 
             if (containerStarted)
             {
+                Game.Injector.InjectWithBaseAnd(extension, owner.CachedComponents);
+                
                 extension.Enable();
                 extension.StartExtension();
             }
-                
         }
 
         public void RemoveExtension<TExtension>()

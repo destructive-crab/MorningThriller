@@ -12,7 +12,7 @@ namespace MothDIed.DI
 
             foreach (var monoBehaviour in all)
             {
-                Game.Injector.Inject(monoBehaviour);
+                Game.Injector.InjectWithBase(monoBehaviour);
             }
         }
     }

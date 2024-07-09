@@ -26,6 +26,8 @@ namespace MorningThriller.LevelGeneration
                 levelScene.CameraSwitcher.Transition.Enable();
                 var passage = roomBase.PassageHandler.FitIn(_playerDummy.transform);
 
+                if(passage == null) return;
+
                 if (passage.Direction == Direction.Top)
                 {
                     StartCoroutine(MovePlayer(Vector3.up));
